@@ -1,6 +1,6 @@
 # MNIST Classification
 
-![Build Status](https://github.com/hsinghweb/era-v3-s6-cnn/workflows/ml-pipeline.yml/badge.svg)
+![Build Status](https://github.com/hsinghweb/era-v3-s6-cnn/actions/workflows/ml-pipeline.yml/badge.svg)
 
 A PyTorch implementation of MNIST digit classification achieving 99.4% test accuracy with less than 20k parameters.
 
