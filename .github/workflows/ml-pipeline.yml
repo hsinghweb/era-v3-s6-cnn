@@ -20,7 +20,7 @@ jobs:
 
     - name: Train model
       run: |
-        python train.py --epochs 15  # Reduced epochs for CI/CD
+        python src/train.py --epochs 15
         
     - name: Run architecture tests
       run: |
