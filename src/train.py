@@ -44,9 +44,17 @@ def main():
     
     train_loader, test_loader = get_data_loaders(BATCH_SIZE)
     
+    # Calculate dataset sizes
+    train_size = len(train_loader.dataset)
+    test_size = len(test_loader.dataset)
+    
     model = Net().to(DEVICE)
     total_params = count_parameters(model)
     print(f"\nTotal Model Parameters: {total_params:,}")
+    print("\nDataset Split:")
+    print(f"Training samples: {train_size:,}")
+    print(f"Validation/Test samples: {test_size:,}")
+    print(f"Split ratio: {train_size}/{test_size}k")
     
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)
@@ -72,10 +80,15 @@ def main():
     
     print("\nTraining Complete!")
     print("=" * 50)
+    print(f"Dataset Split Summary:")
+    print(f"Training Set: {train_size:,} samples")
+    print(f"Validation/Test Set: {test_size:,} samples")
+    print(f"Split Ratio: {train_size}/{test_size}k")
+    print("-" * 50)
     print(f"Total Model Parameters: {total_params:,}")
-    print(f"Final Test Accuracy: {accuracies[-1]:.2f}%")
+    print(f"Best Validation/Test Accuracy: {best_accuracy:.2f}%")
     print(f"Final Training Loss: {train_losses[-1]:.4f}")
-    print(f"Final Test Loss: {test_losses[-1]:.4f}")
+    print(f"Final Validation/Test Loss: {test_losses[-1]:.4f}")
     print("=" * 50)
 
 if __name__ == '__main__':
