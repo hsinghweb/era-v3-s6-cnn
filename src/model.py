@@ -6,35 +6,37 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         # First Block
-        self.conv1 = nn.Conv2d(1, 8, 3, padding=1)  # reduced from 12 to 8
-        self.bn1 = nn.BatchNorm2d(8)
+        self.conv1 = nn.Conv2d(1, 16, 3, padding=1)  # Changed output to 16
+        self.bn1 = nn.BatchNorm2d(16)
         
         # Second Block
-        self.conv2 = nn.Conv2d(8, 16, 3, padding=1)  # reduced from 20 to 16
-        self.bn2 = nn.BatchNorm2d(16)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)  # Changed input to 16 to match previous layer
+        self.bn2 = nn.BatchNorm2d(32)
         self.pool1 = nn.MaxPool2d(2, 2)
         self.dropout1 = nn.Dropout(0.05)
         
         # Third Block
-        self.conv3 = nn.Conv2d(16, 24, 3, padding=1)  # reduced from 32 to 24
-        self.bn3 = nn.BatchNorm2d(24)
+        self.conv3 = nn.Conv2d(32, 32, 3, padding=1)  # Changed input to 32 to match previous layer
+        self.bn3 = nn.BatchNorm2d(32)
         self.pool2 = nn.MaxPool2d(2, 2)
         self.dropout2 = nn.Dropout(0.05)
         
         # Fourth Block with parallel paths
-        self.conv4_1x1 = nn.Conv2d(24, 24, 1)  # reduced from 32 to 24
-        self.conv4_main = nn.Conv2d(24, 24, 3, padding=1)  # reduced from 32 to 24
-        self.bn4 = nn.BatchNorm2d(24)
+        self.conv4_1x1 = nn.Conv2d(32, 32, 1)  # Changed input and output to 32
+        self.conv4_main = nn.Conv2d(32, 32, 3, padding=1)  # Changed input to 32
+        self.bn4 = nn.BatchNorm2d(32)
         
-        # Fifth Block
-        self.conv5 = nn.Conv2d(24, 24, 3, padding=1)  # reduced from 32 to 24
-        self.bn5 = nn.BatchNorm2d(24)
+        # Fifth Block with squeeze-excitation
+        self.conv5 = nn.Conv2d(32, 32, 3, padding=1)  # Changed input and output to 32
+        self.bn5 = nn.BatchNorm2d(32)
+        self.se_fc1 = nn.Linear(32, 24)  # squeeze
+        self.se_fc2 = nn.Linear(24, 32)  # excitation
         
         # Global Average Pooling
         self.gap = nn.AdaptiveAvgPool2d(1)
         
-        # Final FC Layer
-        self.fc = nn.Linear(24, 10)  # reduced input from 32 to 24
+        # Final FC Layers
+        self.fc = nn.Linear(32, 10)  # Changed input to 32
 
     def forward(self, x):
         # First Block
@@ -53,11 +55,16 @@ class Net(nn.Module):
         x_main = F.relu(self.bn4(self.conv4_main(x)))
         x = x_main + F.relu(x_1x1)  # residual-like connection
         
-        # Fifth Block
-        x = F.relu(self.bn5(self.conv5(x)))
+        # Fifth Block with squeeze-excitation
+        x_se = self.gap(x)
+        x_se = x_se.view(-1, 32)
+        x_se = F.relu(self.se_fc1(x_se))
+        x_se = torch.sigmoid(self.se_fc2(x_se))
+        x_se = x_se.view(-1, 32, 1, 1)
+        x = F.relu(self.bn5(self.conv5(x))) * x_se
         
         # GAP and FC
         x = self.gap(x)
-        x = x.view(-1, 24)
-        x = self.fc(x)
+        x = x.view(-1, 32)
+        x = F.relu(self.fc(x))
         return F.log_softmax(x, dim=1) 
