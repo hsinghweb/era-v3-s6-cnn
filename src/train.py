@@ -10,9 +10,8 @@ def count_parameters(model):
 
 def train(model, device, train_loader, optimizer, epoch):
     model.train()
-    pbar = tqdm(train_loader)
     running_loss = 0.0
-    for batch_idx, (data, target) in enumerate(pbar):
+    for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -20,7 +19,6 @@ def train(model, device, train_loader, optimizer, epoch):
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
-        pbar.set_description(f'Epoch {epoch} Loss: {loss.item():.4f}')
     return running_loss / len(train_loader)
 
 def test(model, device, test_loader):
@@ -38,8 +36,7 @@ def test(model, device, test_loader):
     test_loss /= len(test_loader.dataset)
     accuracy = 100. * correct / len(test_loader.dataset)
     
-    print(f'Test set: Average loss: {test_loss:.4f}, '
-          f'Accuracy: {correct}/{len(test_loader.dataset)} ({accuracy:.2f}%)')
+    print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: {accuracy:.2f}%')
     return test_loss, accuracy
 
 def main():
