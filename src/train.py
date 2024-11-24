@@ -5,6 +5,9 @@ from model import Net
 from config import *
 from utils import get_data_loaders
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters())
+
 def train(model, device, train_loader, optimizer, epoch):
     model.train()
     pbar = tqdm(train_loader)
@@ -45,6 +48,9 @@ def main():
     train_loader, test_loader = get_data_loaders(BATCH_SIZE)
     
     model = Net().to(DEVICE)
+    total_params = count_parameters(model)
+    print(f"\nTotal Model Parameters: {total_params:,}")
+    
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)
     
@@ -68,12 +74,12 @@ def main():
         scheduler.step(accuracy)
     
     print("\nTraining Complete!")
-    print(f"Best Test Accuracy: {best_accuracy:.2f}%")
+    print("=" * 50)
+    print(f"Total Model Parameters: {total_params:,}")
+    print(f"Final Test Accuracy: {accuracies[-1]:.2f}%")
     print(f"Final Training Loss: {train_losses[-1]:.4f}")
     print(f"Final Test Loss: {test_losses[-1]:.4f}")
-    print(f"Average Training Loss: {sum(train_losses)/len(train_losses):.4f}")
-    print(f"Average Test Loss: {sum(test_losses)/len(test_losses):.4f}")
-    print(f"Average Test Accuracy: {sum(accuracies)/len(accuracies):.2f}%")
+    print("=" * 50)
 
 if __name__ == '__main__':
     main() 
