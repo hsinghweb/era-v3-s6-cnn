@@ -1,5 +1,5 @@
 import torch
-from src.model import Net
+from model import Net
 
 def test_parameter_count():
     model = Net()
