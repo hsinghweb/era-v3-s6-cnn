@@ -5,31 +5,36 @@ import torch.nn.functional as F
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        # First Block - Reduce initial channels
+        # First Block
         self.conv1 = nn.Conv2d(1, 8, 3, padding=1)  # reduced to 8 channels
         self.bn1 = nn.BatchNorm2d(8)
         
-        # Second Block - Efficient channel increase
+        # Second Block
         self.conv2 = nn.Conv2d(8, 16, 3, padding=1)  # reduced to 16 channels
         self.bn2 = nn.BatchNorm2d(16)
         self.pool1 = nn.MaxPool2d(2, 2)
-        self.dropout1 = nn.Dropout(0.1)
+        self.dropout1 = nn.Dropout(0.15)
         
-        # Third Block - Keep channels moderate
-        self.conv3 = nn.Conv2d(16, 24, 3, padding=1)  # reduced to 24 channels
-        self.bn3 = nn.BatchNorm2d(24)
+        # Third Block
+        self.conv3 = nn.Conv2d(16, 20, 3, padding=1)  # reduced to 20 channels
+        self.bn3 = nn.BatchNorm2d(20)
         self.pool2 = nn.MaxPool2d(2, 2)
-        self.dropout2 = nn.Dropout(0.1)
+        self.dropout2 = nn.Dropout(0.15)
         
-        # Fourth Block - Minimal channel increase
-        self.conv4 = nn.Conv2d(24, 32, 3, padding=1)  # reduced to 32 channels
-        self.bn4 = nn.BatchNorm2d(32)
+        # Fourth Block
+        self.conv4 = nn.Conv2d(20, 24, 3, padding=1)  # reduced to 24 channels
+        self.bn4 = nn.BatchNorm2d(24)
+        self.dropout3 = nn.Dropout(0.15)
+        
+        # Fifth Block
+        self.conv5 = nn.Conv2d(24, 32, 3, padding=1)  # reduced to 32 channels
+        self.bn5 = nn.BatchNorm2d(32)
         
         # Global Average Pooling
         self.gap = nn.AdaptiveAvgPool2d(1)
         
         # Final FC Layer
-        self.fc = nn.Linear(32, 10)  # reduced input features
+        self.fc = nn.Linear(32, 10)
 
     def forward(self, x):
         # First Block
@@ -45,6 +50,10 @@ class Net(nn.Module):
         
         # Fourth Block
         x = F.relu(self.bn4(self.conv4(x)))
+        x = self.dropout3(x)
+        
+        # Fifth Block
+        x = F.relu(self.bn5(self.conv5(x)))
         
         # GAP and FC
         x = self.gap(x)

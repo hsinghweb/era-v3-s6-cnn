@@ -13,6 +13,13 @@ def test_parameter_count():
     
     # Test model accuracy
     model = model.to(DEVICE)
+    try:
+        # Load the trained model weights
+        model.load_state_dict(torch.load('best_model.pth'))
+        print("Loaded trained model weights successfully")
+    except:
+        print("Warning: Could not load trained model weights. Testing with untrained model.")
+    
     _, test_loader = get_data_loaders(BATCH_SIZE)
     
     model.eval()
