@@ -1,5 +1,7 @@
 import torch
 from model import Net
+from utils import get_data_loaders
+from config import DEVICE, BATCH_SIZE
 
 def test_parameter_count():
     model = Net()
@@ -8,6 +10,26 @@ def test_parameter_count():
     print(f"Total parameters in model: {total_params:,}")
     print(f"Parameter limit: 20,000")
     assert total_params < 20000, f"Model has {total_params:,} parameters, should be < 20,000"
+    
+    # Test model accuracy
+    model = model.to(DEVICE)
+    _, test_loader = get_data_loaders(BATCH_SIZE)
+    
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(DEVICE), target.to(DEVICE)
+            output = model(data)
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+            total += target.size(0)
+    
+    accuracy = 100. * correct / total
+    print(f"Current model accuracy: {accuracy:.2f}%")
+    print(f"Required accuracy: 99.4%")
+    assert accuracy >= 99.4, f"Model accuracy {accuracy:.2f}% is below required 99.4%"
 
 def test_model_components():
     model = Net()
