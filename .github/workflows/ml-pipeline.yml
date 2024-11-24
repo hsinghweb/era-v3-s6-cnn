@@ -20,11 +20,11 @@ jobs:
 
     - name: Train model
       run: |
-        python src/train.py --epochs 15
+        python src/train.py
         
     - name: Run architecture tests
       run: |
-        pytest test_model.py -v
+        pytest src/test_model.py -v
 
     - name: Upload training artifacts
       uses: actions/upload-artifact@v3
