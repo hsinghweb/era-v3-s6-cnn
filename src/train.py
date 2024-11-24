@@ -21,7 +21,7 @@ def train(model, device, train_loader, optimizer, epoch):
         running_loss += loss.item()
     return running_loss / len(train_loader)
 
-def test(model, device, test_loader):
+def test(model, device, test_loader, epoch):
     model.eval()
     test_loss = 0
     correct = 0
@@ -36,7 +36,7 @@ def test(model, device, test_loader):
     test_loss /= len(test_loader.dataset)
     accuracy = 100. * correct / len(test_loader.dataset)
     
-    print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: {accuracy:.2f}%')
+    print(f'Epoch {epoch}: Test set: Average loss: {test_loss:.4f}, Accuracy: {accuracy:.2f}%')
     return test_loss, accuracy
 
 def main():
@@ -58,7 +58,7 @@ def main():
     
     for epoch in range(1, EPOCHS + 1):
         train_loss = train(model, DEVICE, train_loader, optimizer, epoch)
-        test_loss, accuracy = test(model, DEVICE, test_loader)
+        test_loss, accuracy = test(model, DEVICE, test_loader, epoch)
         
         train_losses.append(train_loss)
         test_losses.append(test_loss)
