@@ -5,31 +5,31 @@ import torch.nn.functional as F
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        # First Block
-        self.conv1 = nn.Conv2d(1, 16, 3, padding=1)
-        self.bn1 = nn.BatchNorm2d(16)
+        # First Block - Reduce initial channels
+        self.conv1 = nn.Conv2d(1, 8, 3, padding=1)  # reduced to 8 channels
+        self.bn1 = nn.BatchNorm2d(8)
         
-        # Second Block
-        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
-        self.bn2 = nn.BatchNorm2d(32)
+        # Second Block - Efficient channel increase
+        self.conv2 = nn.Conv2d(8, 16, 3, padding=1)  # reduced to 16 channels
+        self.bn2 = nn.BatchNorm2d(16)
         self.pool1 = nn.MaxPool2d(2, 2)
         self.dropout1 = nn.Dropout(0.1)
         
-        # Third Block
-        self.conv3 = nn.Conv2d(32, 48, 3, padding=1)
-        self.bn3 = nn.BatchNorm2d(48)
+        # Third Block - Keep channels moderate
+        self.conv3 = nn.Conv2d(16, 24, 3, padding=1)  # reduced to 24 channels
+        self.bn3 = nn.BatchNorm2d(24)
         self.pool2 = nn.MaxPool2d(2, 2)
         self.dropout2 = nn.Dropout(0.1)
         
-        # Fourth Block
-        self.conv4 = nn.Conv2d(48, 64, 3, padding=1)
-        self.bn4 = nn.BatchNorm2d(64)
+        # Fourth Block - Minimal channel increase
+        self.conv4 = nn.Conv2d(24, 32, 3, padding=1)  # reduced to 32 channels
+        self.bn4 = nn.BatchNorm2d(32)
         
         # Global Average Pooling
         self.gap = nn.AdaptiveAvgPool2d(1)
         
         # Final FC Layer
-        self.fc = nn.Linear(64, 10)
+        self.fc = nn.Linear(32, 10)  # reduced input features
 
     def forward(self, x):
         # First Block
@@ -48,6 +48,6 @@ class Net(nn.Module):
         
         # GAP and FC
         x = self.gap(x)
-        x = x.view(-1, 64)
+        x = x.view(-1, 32)
         x = self.fc(x)
         return F.log_softmax(x, dim=1) 
