@@ -54,7 +54,7 @@ def main():
     print("\nDataset Split:")
     print(f"Training samples: {train_size:,}")
     print(f"Validation/Test samples: {test_size:,}")
-    print(f"Split ratio: {train_size}/{test_size}k")
+    print(f"Split ratio: {train_size}/{test_size}")
     
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)
@@ -83,7 +83,7 @@ def main():
     print(f"Dataset Split Summary:")
     print(f"Training Set: {train_size:,} samples")
     print(f"Validation/Test Set: {test_size:,} samples")
-    print(f"Split Ratio: {train_size}/{test_size}k")
+    print(f"Split Ratio: {train_size}/{test_size}")
     print("-" * 50)
     print(f"Total Model Parameters: {total_params:,}")
     print(f"Best Validation/Test Accuracy: {best_accuracy:.2f}%")
