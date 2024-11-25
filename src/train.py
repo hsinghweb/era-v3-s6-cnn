@@ -63,6 +63,7 @@ def main():
     train_losses = []
     test_losses = []
     accuracies = []
+    target_accuracy = 99.4
     
     for epoch in range(1, EPOCHS + 1):
         train_loss = train(model, DEVICE, train_loader, optimizer, epoch)
@@ -77,6 +78,11 @@ def main():
             torch.save(model.state_dict(), 'best_model.pth')
             
         scheduler.step(accuracy)
+        
+        # Early stopping if accuracy reaches target
+        if accuracy >= target_accuracy:
+            print(f"\nReached target accuracy of {target_accuracy}% at epoch {epoch}")
+            break
     
     print("\nTraining Complete!")
     print("=" * 50)
@@ -89,6 +95,7 @@ def main():
     print(f"Best Validation/Test Accuracy: {best_accuracy:.2f}%")
     print(f"Final Training Loss: {train_losses[-1]:.4f}")
     print(f"Final Validation/Test Loss: {test_losses[-1]:.4f}")
+    print(f"Training stopped at epoch: {len(accuracies)}/{EPOCHS}")
     print("=" * 50)
 
 if __name__ == '__main__':
